@@ -1,0 +1,8 @@
+---
+- name: Setup swap file
+  command: "/sbin/mkswap {{ swap_file_path }}"
+  become: yes
+
+- name: Enable swap file
+  command: "/sbin/swapon {{ swap_file_path }}"
+  become: yes
