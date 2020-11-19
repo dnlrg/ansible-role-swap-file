@@ -1,0 +1,44 @@
+---
+- name: Register /proc/swaps
+  command: "grep -q '{{ swap_file_path }} ' /proc/swaps"
+  register: swap_file_in_swaps
+  changed_when: swap_file_in_swaps.rc == 1
+  failed_when: swap_file_in_swaps.stderr
+  notify:
+    - Enable swap file
+  tags:
+    - swap_file
+
+- name: Swap file present
+  command:
+    cmd: "dd if=/dev/zero of={{ swap_file_path }} bs=1M count={{ swap_file_size }}"
+    creates: "{{ swap_file_path }}"
+  become: yes
+  register: swap_file_new
+  notify:
+    - Setup swap file
+  tags:
+    - swap_file
+
+- name: Swap file permissions
+  file:
+    path: "{{ swap_file_path }}"
+    owner: root
+    group: root
+    mode: "0600"
+  become: yes
+  tags:
+    - swap_file
+
+- name: Swap fstab entry present
+  mount:
+    path: none
+    src: "{{ swap_file_path }}"
+    fstype: swap
+    opts: sw
+    passno: "0"
+    dump: "0"
+    state: present
+  become: yes
+  tags:
+    - swap_file
