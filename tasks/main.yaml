@@ -1,9 +1,8 @@
 ---
-- name: Register /proc/swaps
-  command: "grep -q '{{ swap_file_path }} ' /proc/swaps"
-  register: swap_file_in_swaps
-  changed_when: swap_file_in_swaps.rc == 1
-  failed_when: swap_file_in_swaps.stderr
+- name: Register swap area
+  command: "/sbin/swapon --show=NAME --noheadings"
+  register: swap_file_on
+  changed_when: swap_file_on.stdout is not match("^" + swap_file_path + "$")
   notify:
     - Enable swap file
   tags:
