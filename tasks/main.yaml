@@ -5,6 +5,7 @@
   changed_when: swap_file_on.stdout is not match("^" + swap_file_path + "$")
   notify:
     - Enable swap file
+    - Setup swap file
   tags:
     - swap_file
 
@@ -13,9 +14,6 @@
     cmd: "dd if=/dev/zero of={{ swap_file_path }} bs=1M count={{ swap_file_size }}"
     creates: "{{ swap_file_path }}"
   become: yes
-  register: swap_file_new
-  notify:
-    - Setup swap file
   tags:
     - swap_file
 
